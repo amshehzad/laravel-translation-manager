@@ -99,7 +99,15 @@ return [
     'layout' => 'translation-manager::layout',
 
     /*
-     * Choose which  template to use [bootstrap3, bootstrap4, bootstrap5, tailwind3 ]
+     * Choose which template to use [bootstrap3, bootstrap4, bootstrap5, tailwind3 ]
      */
     'template' => 'tailwind3',
+
+    /*
+     * Extra options during the exportations
+     */
+    'export-options' => [
+        'use-old-format' => false,
+        'has-sub-folders' => true,
+    ],
 ];

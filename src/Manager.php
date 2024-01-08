@@ -2,9 +2,9 @@
 
 namespace Barryvdh\TranslationManager;
 
-use Lang;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Brick\VarExporter\VarExporter;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -17,17 +17,17 @@ class Manager
     public const JSON_GROUP = '_json';
 
     /**
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var Application
      */
     protected $app;
 
     /**
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var Filesystem
      */
     protected $files;
 
     /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var Dispatcher
      */
     protected $events;
 
@@ -41,9 +41,6 @@ class Manager
      */
     protected $locales;
 
-    /**
-     * @var mixed
-     */
     protected $ignoreLocales;
 
     /**
@@ -119,7 +116,7 @@ class Manager
                 }
 
                 if (!$vendor) {
-                    $translations = Lang::getLoader()->load($locale, $group);
+                    $translations = \Lang::getLoader()->load($locale, $group);
                 } else {
                     $translations = include $file;
                     $group = 'vendor/'.$vendorName;
@@ -141,7 +138,7 @@ class Manager
             $locale = basename($jsonTranslationFile, '.json');
             $group = self::JSON_GROUP;
             $translations =
-                Lang::getLoader()->load($locale, '*', '*'); // Retrieves JSON entries of the given locale only
+                \Lang::getLoader()->load($locale, '*', '*'); // Retrieves JSON entries of the given locale only
             if ($translations && is_array($translations)) {
                 foreach ($translations as $key => $value) {
                     $importedTranslation = $this->importTranslation($key, $value, $locale, $group, $replace);
@@ -275,7 +272,9 @@ class Manager
 
     public function exportTranslations($group = null, $json = false): void
     {
-        $group = basename($group);
+        if (Arr::get($this->config, 'export.options.has-sub-folder', false)) {
+            $group = basename($group);
+        }
         $basePath = $this->app['path.lang'];
 
         if (!is_null($group) && !$json) {
@@ -320,12 +319,18 @@ class Manager
                         }
 
                         if ($vendor) {
-                            $path = $path.DIRECTORY_SEPARATOR.'messages.php';
+                            $path .= DIRECTORY_SEPARATOR.'messages.php';
                         } else {
-                            $path = $path.DIRECTORY_SEPARATOR.$locale.DIRECTORY_SEPARATOR.$group.'.php';
+                            $path .= DIRECTORY_SEPARATOR.$locale.DIRECTORY_SEPARATOR.$group.'.php';
                         }
 
-                        $output = "<?php\n\nreturn ".var_export($translations, true).';'.\PHP_EOL;
+                        $output = "<?php\n\n";
+                        if (Arr::get($this->config, 'export.options.use-old-format', false)) {
+                            $output .= 'return '.var_export($translations, true).';'.\PHP_EOL;
+                        } else {
+                            $this->recurKSort($translations);
+                            $output .= VarExporter::export($translations, VarExporter::ADD_RETURN);
+                        }
                         $this->files->put($path, $output);
                     }
                 }
@@ -374,8 +379,11 @@ class Manager
         foreach ($translations as $translation) {
             // For JSON and sentences, do not use dotted notation
             if ($json || Str::contains($translation->key, [' ']) || Str::endsWith($translation->key, ['.'])) {
-                $this->jsonSet($array[$translation->locale][$translation->group], $translation->key,
-                    $translation->value);
+                $this->jsonSet(
+                    $array[$translation->locale][$translation->group],
+                    $translation->key,
+                    $translation->value
+                );
             } else {
                 Arr::set(
                     $array[$translation->locale][$translation->group],
@@ -476,5 +484,15 @@ class Manager
         }
 
         return $this->config[$key];
+    }
+
+    private function recurKSort(&$array): void
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $this->recurKSort($value);
+            }
+        }
+        ksort($array);
     }
 }
