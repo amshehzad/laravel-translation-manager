@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": ">=7.2",
-        "brick/varexporter": "^0.3.0",
+        "brick/varexporter": "^0.3.0|^0.4.0",
         "illuminate/support": "^9|^10",
         "illuminate/translation": "^9|^10",
         "symfony/finder": "^6"
