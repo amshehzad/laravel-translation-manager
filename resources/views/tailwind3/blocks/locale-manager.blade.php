@@ -1,4 +1,5 @@
 <div class="bg-white border border-gray-300 overflow-hidden shadow rounded-lg mt-2">
+    <x-translation-manager::loader/>
     <div class="px-4 py-5 sm:p-6">
         <fieldset>
             <legend class="text-xl mb-2">{{ __('Supported locales') }}</legend>
@@ -27,13 +28,19 @@
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div class="sm:col-span-3">
                             <input type="text" wire:model="localeName"
-                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"/>
+                                   class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('localeName') border-red-500 @enderror "/>
+                            @error('localeName')
+                            <span class="font-light text-sm text-red-600" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
                         </div>
                         <div class="sm:col-span-3">
                             <button
-                                    class="inline-flex justify-center py-2 px-4 border border-green-600 shadow-sm text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
-                                    wire:click.prevent="addLocale"
-                                    data-disable-with="Adding...">Add new locale
+                                class="inline-flex justify-center py-2 px-4 border border-green-600 shadow-sm text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
+                                wire:click.prevent="addLocale">
+                                <span wire:loading.remove wire:target="addLocale">{{ __('Add new locale') }}</span>
+                                <span wire:loading wire:target="addLocale">{{ __('Adding...') }}</span>
                             </button>
                         </div>
                     </div>

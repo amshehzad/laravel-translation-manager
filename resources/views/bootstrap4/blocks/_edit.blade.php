@@ -1,17 +1,22 @@
 <div class="card mt-2">
     <div class="card-body">
-        <form action="{{ action($controller.'@postAdd', [$group])}}" method="POST" role="form">
-            @csrf()
+        <form wire:submit.prevent="addKeys" role="form">
+            <div class="mb-3">
+                <label>Enter a new group name and start edit translations in that group:</label>
+                <input type="text" class="form-control" wire:model="newGroup"/>
+            </div>
+            <div>{{ __('Add new keys to this group:') }}</div>
             <div class="form-group">
-                <label>Add new keys to this group</label>
-                <textarea class="form-control" rows="3" name="keys" placeholder="Add 1 key per line, without the group prefix"></textarea>
+                <label for="keys">{{ __('Add 1 key per line, without the group prefix') }}</label>
+                <textarea class="form-control" rows="3" name="keys" wire:model="keys" placeholder="Add 1 key per line, without the group prefix"></textarea>
             </div>
             <div class="form-group">
                 <input type="submit" value="Add keys" class="btn btn-primary">
             </div>
+
         </form>
         <hr>
-        <h4>Total: {{ $numTranslations }}, changed: {{ $numChanged }}</h4>
+        <h4>Total: {{ $numTranslations }}, changed: {{ $changedTranslationsCount }}</h4>
         <table class="table">
             <thead>
             <tr>
@@ -30,22 +35,19 @@
                 <tr id="{{ $key }}">
                     <td>{{ $key }}</td>
                     @foreach ($locales as $locale)
-                        @php($t = isset($translation[$locale]) ? $translation[$locale] : null)
+                        @php($t = $translation[$locale] ?? null)
                         <td>
-                            <a href="#edit"
-                               class="editable status-{{$t ? $t->status : 0 }} locale-{{ $locale }}"
-                               data-locale="{{$locale}}" data-name="{{ $locale }}|{{ $key }}"
-                               id="username" data-type="textarea" data-pk="{{ $t ? $t->id : 0}}"
-                               data-url="{{$editUrl}}"
-                               data-title="Enter translation">{{ $t ? htmlentities($t->value, ENT_QUOTES,  'UTF-8', false) : '' }}</a>
+                            <livewire:translation-editor wire:key='{{ "{$locale}_{$key}" }}' :$locale :$group :translation-key="$key" :value="$t?->value"/>
                         </td>
                     @endforeach
                     @if ($deleteEnabled)
                         <td>
-                            <a href="{{ action($controller . '@postDelete', [$group, $key]) }}"
-                               class="delete-key"
-                               data-confirm="Are you sure you want to delete the translations for '{{ $key }}'?">
-                                <span class=" fa fa-trash"></span>
+                            <a href="#" wire:click="removeKey(@js($key))"
+                               wire:confirm="Are you sure you want to delete the translations for '{{ $key }}'?"
+                               class="delete-key">
+                                <svg width="20" height="20" class="text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
                             </a>
                         </td>
                     @endif

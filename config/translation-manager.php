@@ -11,7 +11,7 @@ return [
     */
     'route' => [
         'prefix' => 'translations',
-        'middleware' => 'auth',
+        /*'middleware' => 'auth',*/
     ],
 
     /*
@@ -82,24 +82,24 @@ return [
      *
      * @type boolean
      */
-    'pagination_enabled' => false,
+    'pagination_enabled' => true,
 
     /*
      * Define number of translations per page
      *
      * @type integer
      */
-    'per_page' => 40,
+    'per_page' => 50,
 
     /* ------------------------------------------------------------------------------------------------
      | Set Views options
-     | --------------------------å----------------------------------------------------------------------
+     | ------------------------------------------------------------------------------------------------
      | Here you can set The "extends" blade of index.blade.php
     */
     'layout' => 'translation-manager::layout',
 
     /*
-     * Choose which template to use [bootstrap3, bootstrap4, bootstrap5, tailwind3 ]
+     * Choose which template to use [bootstrap4, bootstrap5, tailwind3 ]
      */
     'template' => 'tailwind3',
 

@@ -10,46 +10,29 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Barryvdh\TranslationManager\Models\Translation;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Barryvdh\TranslationManager\Events\TranslationsExportedEvent;
 
 class Manager
 {
     public const JSON_GROUP = '_json';
 
-    /**
-     * @var Application
-     */
-    protected $app;
+    protected Application $app;
+
+    protected Filesystem $files;
+
+    protected Dispatcher $events;
+
+    protected array $config;
+
+    protected array $locales;
+
+    protected array $ignoreLocales;
+
+    protected string $ignoreFilePath;
 
     /**
-     * @var Filesystem
-     */
-    protected $files;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $events;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var array
-     */
-    protected $locales;
-
-    protected $ignoreLocales;
-
-    /**
-     * @var string
-     */
-    protected $ignoreFilePath;
-
-    /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function __construct(Application $app, Filesystem $files, Dispatcher $events)
     {
@@ -63,9 +46,9 @@ class Manager
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    protected function getIgnoredLocales()
+    protected function getIgnoredLocales(): array
     {
         if (!$this->files->exists($this->ignoreFilePath)) {
             return [];
@@ -340,8 +323,8 @@ class Manager
 
         if ($json) {
             $tree = $this->makeTree(Translation::ofTranslatedGroup(self::JSON_GROUP)
-                                                ->orderByGroupKeys(Arr::get($this->config, 'sort_keys', false))
-                                                ->get(), true);
+                ->orderByGroupKeys(Arr::get($this->config, 'sort_keys', false))
+                ->get(), true);
 
             foreach ($tree as $locale => $groups) {
                 if (isset($groups[self::JSON_GROUP])) {
@@ -437,7 +420,7 @@ class Manager
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function addLocale($locale): bool
     {
@@ -454,16 +437,13 @@ class Manager
         return true;
     }
 
-    /**
-     * @return bool|int
-     */
-    protected function saveIgnoredLocales()
+    protected function saveIgnoredLocales(): bool|int
     {
         return $this->files->put($this->ignoreFilePath, json_encode($this->ignoreLocales));
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function removeLocale($locale)
     {

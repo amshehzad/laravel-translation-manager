@@ -2,7 +2,11 @@
 
 namespace Barryvdh\TranslationManager;
 
+use Barryvdh\TranslationManager\Livewire\LocaleManager;
+use Barryvdh\TranslationManager\Livewire\TranslationEditor;
+use Barryvdh\TranslationManager\Livewire\TranslationManager;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class ManagerServiceProvider extends ServiceProvider
 {
@@ -68,6 +72,10 @@ class ManagerServiceProvider extends ServiceProvider
         ], 'migrations');
 
         $this->loadRoutesFrom(__DIR__.'/routes.php');
+
+        Livewire::component('locale-manager', LocaleManager::class);
+        Livewire::component('translation-manager', TranslationManager::class);
+        Livewire::component('translation-editor', TranslationEditor::class);
     }
 
     /**

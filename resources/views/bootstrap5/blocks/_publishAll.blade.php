@@ -1,13 +1,13 @@
 <div class="card mt-2">
     <div class="card-body">
         <fieldset>
-            <legend>Export all translations</legend>
-            <form class="form-inline form-publish-all" method="POST"
-                  action="{{ action($controller.'@postPublish', '*') }}" data-remote="true" role="form"
-                  data-confirm="Are you sure you want to publish all translations group? This will overwrite existing language files.">
-                @csrf()
-                <button type="submit" class="btn btn-primary" data-disable-with="Publishing..">Publish all</button>
-            </form>
+            <legend>{{ __('Export all translations') }}</legend>
+            <button
+                wire:confirm="Are you sure you want to publish all translations group? This will overwrite existing language files."
+                class="btn btn-primary" wire:click="publishTranslations">
+                <span wire:loading.remove wire:target="publishAll">Publish all</span>
+                <span wire:loading wire:target="publishAll">Publishing..</span>
+            </button>
         </fieldset>
     </div>
 </div>

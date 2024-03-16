@@ -2,21 +2,8 @@
 
 namespace Barryvdh\TranslationManager\Models;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Translation model.
- *
- * @property int            $id
- * @property int            $status
- * @property string         $locale
- * @property string         $group
- * @property string         $key
- * @property string         $value
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- */
 class Translation extends Model
 {
     public const STATUS_SAVED = 0;
@@ -41,26 +28,15 @@ class Translation extends Model
 
     public function scopeSelectDistinctGroup($query)
     {
-        $select = '';
+        $select = match (\DB::getDriverName()) {
+            'mysql' => 'DISTINCT `group`',
+            default => 'DISTINCT "group"',
+        };
 
-        switch (DB::getDriverName()) {
-            case 'mysql':
-                $select = 'DISTINCT `group`';
-                break;
-            default:
-                $select = 'DISTINCT "group"';
-                break;
-        }
-
-        return $query->select(DB::raw($select));
+        return $query->select(\DB::raw($select));
     }
 
-    /**
-     * Get the current connection name for the model.
-     *
-     * @return string|null
-     */
-    public function getConnectionName()
+    public function getConnectionName(): ?string
     {
         if ($connection = config('translation-manager.db_connection')) {
             return $connection;

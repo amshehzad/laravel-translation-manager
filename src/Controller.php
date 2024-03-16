@@ -2,6 +2,11 @@
 
 namespace Barryvdh\TranslationManager;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -9,10 +14,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Barryvdh\TranslationManager\Models\Translation;
 use Illuminate\Routing\Controller as BaseController;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class Controller extends BaseController
 {
-    /** @var \Barryvdh\TranslationManager\Manager */
+    /** @var Manager */
     protected $manager;
 
     public function __construct(Manager $manager)
@@ -23,10 +30,10 @@ class Controller extends BaseController
     /**
      * @param string $group
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function getView($group = null)
     {
@@ -36,10 +43,10 @@ class Controller extends BaseController
     /**
      * @param string $group
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function getIndex($group = null)
     {
@@ -109,7 +116,7 @@ class Controller extends BaseController
     /**
      * @param string $selectedModel
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
     public function getModelView($selectedModel = null)
     {
@@ -131,7 +138,7 @@ class Controller extends BaseController
         $numTranslations = 0;
         $translatableSource = config('translation-manager.model-field-source');
         foreach ($allTranslationModels as $translationModel) {
-            /* @var \Illuminate\Database\Eloquent\Model $translationModel */
+            /* @var Model $translationModel */
             foreach ((new $models[$selectedModel]())->$translatableSource as $field) {
                 foreach ($locales as $locale) {
                     $translationValues = json_decode($translationModel->getAttributes()[$field] ?? '' ?: '{}', true) ?: [];
@@ -240,7 +247,7 @@ class Controller extends BaseController
 
             [$locale, $field, $key] = explode('|', $name, 3);
 
-            /* @var \Illuminate\Database\Eloquent\Model $model */
+            /* @var Model $model */
             $model = (new $models[$selectedModel]())->findOrFail($key);
             $translationValues = json_decode($model->getAttributes()[$field] ?? '' ?: '{}', true) ?: [];
             $translationValues[$locale] = $value ? (string) $value : null;
@@ -302,7 +309,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function postAddLocale(Request $request): RedirectResponse
     {
@@ -317,7 +324,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function postRemoveLocale(Request $request): RedirectResponse
     {
