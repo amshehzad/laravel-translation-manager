@@ -2,18 +2,14 @@
 
 namespace Barryvdh\TranslationManager;
 
+use Illuminate\Events\Dispatcher;
 use Illuminate\Translation\Translator as LaravelTranslator;
 
 class Translator extends LaravelTranslator
 {
-    /**
-     * @var \Illuminate\Events\Dispatcher
-     */
-    protected $events;
-    /**
-     * @var \Barryvdh\TranslationManager\Manager
-     */
-    private $manager;
+    protected Dispatcher $events;
+
+    private Manager $manager;
 
     /**
      * Get the translation for the given key.
@@ -43,7 +39,7 @@ class Translator extends LaravelTranslator
     protected function notifyMissingKey($key): void
     {
         [$namespace, $group, $item] = $this->parseKey($key);
-        if ($this->manager && '*' === $namespace && $group && $item) {
+        if ('*' === $namespace && $group && $item) {
             $this->manager->missingKey($namespace, $group, $item);
         }
     }

@@ -2,94 +2,78 @@
 
 namespace Barryvdh\TranslationManager;
 
+use Livewire\Livewire;
+use Illuminate\Support\ServiceProvider;
 use Barryvdh\TranslationManager\Livewire\LocaleManager;
 use Barryvdh\TranslationManager\Livewire\TranslationEditor;
 use Barryvdh\TranslationManager\Livewire\TranslationManager;
-use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 
 class ManagerServiceProvider extends ServiceProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     */
-    protected $defer = false;
+    public static function basePath(string $path): string
+    {
+        return __DIR__.'/..'.$path;
+    }
 
-    /**
-     * Register the service provider.
-     */
     public function register(): void
     {
         // Register the config publish path
-        $configPath = __DIR__.'/../config/translation-manager.php';
-        $this->mergeConfigFrom($configPath, 'translation-manager');
-        $this->publishes([$configPath => config_path('translation-manager.php')], 'config');
+        $this->mergeConfigFrom(__DIR__.'/../config/translation-manager.php', 'translation-manager');
+        $this->publishes([__DIR__.'/../config/translation-manager.php' => config_path('translation-manager.php')], 'config');
 
         $this->app->singleton('translation-manager', function ($app) {
             return $app->make(Manager::class);
         });
-
-        $this->app->singleton('command.translation-manager.reset', function ($app) {
-            return new Console\ResetCommand($app['translation-manager']);
-        });
-        $this->commands('command.translation-manager.reset');
-
-        $this->app->singleton('command.translation-manager.import', function ($app) {
-            return new Console\ImportCommand($app['translation-manager']);
-        });
-        $this->commands('command.translation-manager.import');
-
-        $this->app->singleton('command.translation-manager.find', function ($app) {
-            return new Console\FindCommand($app['translation-manager']);
-        });
-        $this->commands('command.translation-manager.find');
-
-        $this->app->singleton('command.translation-manager.export', function ($app) {
-            return new Console\ExportCommand($app['translation-manager']);
-        });
-        $this->commands('command.translation-manager.export');
-
-        $this->app->singleton('command.translation-manager.clean', function ($app) {
-            return new Console\CleanCommand($app['translation-manager']);
-        });
-        $this->commands('command.translation-manager.clean');
     }
 
-    /**
-     * Bootstrap the application events.
-     */
     public function boot(): void
     {
-        $viewPath = __DIR__.'/../resources/views';
-        $this->loadViewsFrom($viewPath, 'translation-manager');
-        $this->publishes([
-            $viewPath => base_path('resources/views/vendor/translation-manager'),
-        ], 'views');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'translation-manager');
 
-        $migrationPath = __DIR__.'/../database/migrations';
-        $this->publishes([
-            $migrationPath => base_path('database/migrations'),
-        ], 'migrations');
+        $this->registerCommands();
+        $this->registerPublishables();
+        $this->registerLivewireComponents();
+        $this->registerRoutes();
+    }
 
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+    protected function registerCommands(): void
+    {
+        $this->commands([
+            Commands\CleanCommand::class,
+            Commands\ExportCommand::class,
+            Commands\FindCommand::class,
+            Commands\ImportCommand::class,
+        ]);
+    }
+
+    protected function registerRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+    }
+
+    public function registerLivewireComponents(): self
+    {
+        if (!class_exists(Livewire::class)) {
+            return $this;
+        }
 
         Livewire::component('locale-manager', LocaleManager::class);
         Livewire::component('translation-manager', TranslationManager::class);
         Livewire::component('translation-editor', TranslationEditor::class);
+
+        return $this;
     }
 
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
+    protected function registerPublishables(): self
     {
-        return [
-            'translation-manager',
-            'command.translation-manager.reset',
-            'command.translation-manager.import',
-            'command.translation-manager.find',
-            'command.translation-manager.export',
-            'command.translation-manager.clean',
-        ];
+        $this->publishes([
+            __DIR__.'/../resources/views' => base_path('resources/views/vendor/translation-manager'),
+        ], 'views');
+
+        $this->publishes([
+            __DIR__.'/../database/migrations' => base_path('database/migrations'),
+        ], 'migrations');
+
+        return $this;
     }
 }

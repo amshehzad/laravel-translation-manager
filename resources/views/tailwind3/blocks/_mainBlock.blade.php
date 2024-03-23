@@ -24,10 +24,12 @@
                     </div>
                 </div>
             </form>
-
+            <hr>
             <div class="mt-6" role="group">
-                <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                <button
+                    wire:confirm="Are you sure you want to scan you app folder? All found translation keys will be added to the database."
+                    wire:click="findTranslations"
+                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
                     <span wire:loading.remove wire:target="findTranslations">{{ __('Find translations in files') }}</span>
                     <span wire:loading wire:target="findTranslations">{{ __('Searching...') }}</span>
                 </button>

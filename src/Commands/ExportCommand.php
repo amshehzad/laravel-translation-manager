@@ -1,6 +1,6 @@
 <?php
 
-namespace Barryvdh\TranslationManager\Console;
+namespace Barryvdh\TranslationManager\Commands;
 
 use Illuminate\Console\Command;
 use Barryvdh\TranslationManager\Manager;
@@ -9,35 +9,11 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class ExportCommand extends Command
 {
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
     protected $name = 'translations:export {group}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Export translations to PHP files';
 
-    /**
-     * @var \Barryvdh\TranslationManager\Manager
-     */
-    protected $manager;
-
-    public function __construct(Manager $manager)
-    {
-        $this->manager = $manager;
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     */
-    public function handle(): void
+    public function handle(Manager $manager): void
     {
         $group = $this->option('all') ? '*' : $this->argument('group');
         $json = $this->option('json');
@@ -55,9 +31,9 @@ class ExportCommand extends Command
         }
 
         if ('*' === $group) {
-            $this->manager->exportAllTranslations();
+            $manager->exportAllTranslations();
         } else {
-            $this->manager->exportTranslations($group, $json);
+            $manager->exportTranslations($group, $json);
         }
 
         if (!is_null($group)) {
@@ -67,9 +43,6 @@ class ExportCommand extends Command
         }
     }
 
-    /**
-     * Get the console command arguments.
-     */
     protected function getArguments(): array
     {
         return [
@@ -77,9 +50,6 @@ class ExportCommand extends Command
         ];
     }
 
-    /**
-     * Get the console command options.
-     */
     protected function getOptions(): array
     {
         return [

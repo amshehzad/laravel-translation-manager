@@ -2,7 +2,7 @@
     <div class="card-body">
         <form wire:submit.prevent="addKeys" role="form">
             <div class="mb-3">
-                <label>Enter a new group name and start edit translations in that group:</label>
+                <label>{{ __('Enter a new group name and start edit translations in that group:') }}</label>
                 <input type="text" class="form-control" wire:model="newGroup"/>
             </div>
             <div>{{ __('Add new keys to this group:') }}</div>
@@ -14,7 +14,7 @@
             <input type="submit" class="btn btn-primary">
         </form>
         <hr>
-        <h4>Total: {{ $numTranslations }}, changed: {{ $changedTranslationsCount }}</h4>
+        <h4>{{ __('Total:') }} {{ $numTranslations }}, {{ __('changed:') }} {{ $changedTranslationsCount }}</h4>
         <table class="table">
             <thead>
             <tr>

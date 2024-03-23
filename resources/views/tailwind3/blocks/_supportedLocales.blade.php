@@ -9,7 +9,7 @@
                     <li class="mb-3 flex items-center">
                         <span class="mr-2">{{ $locale }}</span>
                         <button
-                            wire:confirm="Are you sure to remove this locale and all of data?"
+                            wire:confirm="{{ __('Are you sure to remove this locale and all of data?') }}"
                             wire:click="removeLocale('{{ $locale }}')" class="text-red-600 p-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                                  viewBox="0 0 16 16">
@@ -33,7 +33,7 @@
                             <button
                                     class="inline-flex justify-center py-2 px-4 border border-green-600 shadow-sm text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
                                     wire:click.prevent="addLocale"
-                                    data-disable-with="Adding...">Add new locale
+                                    data-disable-with="Adding...">{{ __('Add new locale') }}
                             </button>
                         </div>
                     </div>

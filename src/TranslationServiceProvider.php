@@ -6,9 +6,6 @@ use Illuminate\Translation\TranslationServiceProvider as BaseTranslationServiceP
 
 class TranslationServiceProvider extends BaseTranslationServiceProvider
 {
-    /**
-     * Register the service provider.
-     */
     public function register(): void
     {
         $this->registerLoader();

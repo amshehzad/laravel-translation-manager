@@ -19,6 +19,7 @@
                     </div>
                 </div>
             </form>
+            <hr>
             <div class="btn-group" role="group">
                 <button
                     wire:confirm="Are you sure you want to scan you app folder? All found translation keys will be added to the database."

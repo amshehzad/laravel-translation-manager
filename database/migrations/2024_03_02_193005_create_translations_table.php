@@ -3,11 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTranslationsTable extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
+
     public function up(): void
     {
         Schema::create('ltm_translations', static function (Blueprint $table) {
@@ -22,11 +19,8 @@ class CreateTranslationsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('ltm_translations');
     }
-}
+};

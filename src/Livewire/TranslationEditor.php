@@ -2,9 +2,9 @@
 
 namespace Barryvdh\TranslationManager\Livewire;
 
-use Barryvdh\TranslationManager\Manager;
 use Livewire\Component;
 use Illuminate\Contracts\View\View;
+use Barryvdh\TranslationManager\Manager;
 use Barryvdh\TranslationManager\Models\Translation;
 
 class TranslationEditor extends Component
@@ -36,6 +36,7 @@ class TranslationEditor extends Component
     public function render(): View
     {
         $theme = $this->manager->getConfig('template');
+
         return view("translation-manager::$theme.blocks.translation-editor");
     }
 
